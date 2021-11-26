@@ -1,4 +1,5 @@
 mod utils;
+use js_sys::Math::random;
 use std::fmt;
 use wasm_bindgen::prelude::*;
 
@@ -23,6 +24,7 @@ pub struct Universe {
     cells: Vec<Cell>,
 }
 
+#[wasm_bindgen]
 impl Universe {
     fn get_index(&self, row: u32, column: u32) -> usize {
         (row * self.width + column) as usize
@@ -69,6 +71,48 @@ impl Universe {
             }
         }
         self.cells = next;
+    }
+
+    pub fn new(width: u32, height: u32) -> Self {
+        let cells = (0..width * height)
+            .map(|_| {
+                let r = random();
+
+                if r <= 0.5 {
+                    Cell::Alive
+                } else {
+                    Cell::Dead
+                }
+            })
+            .collect();
+
+        Self {
+            width,
+            height,
+            cells,
+        }
+    }
+
+    pub fn render(&self) -> String {
+        self.to_string()
+    }
+
+    pub fn width(&self) -> u32 {
+        self.width
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn cells(&self) -> *const Cell {
+        self.cells.as_ptr()
+    }
+}
+
+impl Default for Universe {
+    fn default() -> Self {
+        Self::new(64, 64)
     }
 }
 
